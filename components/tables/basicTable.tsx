@@ -88,7 +88,6 @@ export default function BasicTable({data, loading, searched, error, onView}: Bas
             key: 'fullName',
             fixed: 'left',
             width: 220,
-            sorter: (a, b) => a.fullName.localeCompare(b.fullName),
             render: (name: string, row) => (
                 <Space direction="vertical" size={0}>
                     <span className="font-medium">{name}</span>
@@ -131,7 +130,6 @@ export default function BasicTable({data, loading, searched, error, onView}: Bas
             title: 'Applications',
             key: 'applications',
             width: 130,
-            sorter: (a, b) => a.stats.totalApplications - b.stats.totalApplications,
             defaultSortOrder: 'descend',
             render: (_, row) => (
                 <Space size={4}>

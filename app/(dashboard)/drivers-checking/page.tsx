@@ -5,7 +5,7 @@ import {App as AntApp} from "antd";
 import {DriverProfile, DriverSearchResponse, DriversFilters} from "@/models/driver";
 import Filters from "@/components/filters/filters";
 import BasicTable from "@/components/tables/basicTable";
-import DriverDetailDrawer from "@/components/drivers/driverDetailDrawer";
+import DriverProfileModal from "@/components/drivers/driverProfileModal";
 
 const EMPTY: DriversFilters = {search: '', phoneNumber: '', email: ''};
 
@@ -113,7 +113,7 @@ export default function DriversChecking() {
                 error={error}
                 onView={setSelected}
             />
-            <DriverDetailDrawer
+            <DriverProfileModal
                 profile={selected}
                 open={Boolean(selected)}
                 onClose={() => setSelected(null)}

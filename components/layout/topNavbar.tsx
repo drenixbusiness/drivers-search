@@ -1,58 +1,85 @@
 'use client'
 
-import {Avatar, Badge, Layout, Space} from "antd";
-import { BellOutlined } from '@ant-design/icons';
+import {CSSProperties, useState} from "react";
+import {Avatar, Button, Layout, Space} from "antd";
+import {MenuFoldOutlined, MenuUnfoldOutlined} from '@ant-design/icons';
+import {CURRENT_USER} from "@/lib/config/currentUser";
+import UserProfileModal from "@/components/layout/userProfileModal";
+import NotificationsBell from "@/components/layout/notificationsBell";
 
-const { Header } = Layout;
+const {Header} = Layout;
 
 interface TopNavbarProps {
-    style?: { background: string; padding: string };
+    style?: CSSProperties;
     userName?: string;
     avatar?: string;
+    /** Opens the mobile drawer. Omitted on desktop, where the sidebar is always visible. */
+    onToggleMenu?: () => void;
+    menuCollapsed?: boolean;
 }
 
 export default function TopNavbar({
-                                      userName='Asilbek',
-                                      avatar='images/avatar.png',
+                                      userName,
+                                      avatar,
                                       style,
-}: TopNavbarProps) {
+                                      onToggleMenu,
+                                      menuCollapsed = false,
+                                  }: TopNavbarProps) {
+    const [profileOpen, setProfileOpen] = useState(false);
+
+    // Props win over the configured user, so the navbar can still be reused elsewhere.
+    const user = {
+        ...CURRENT_USER,
+        ...(userName ? {name: userName} : {}),
+        ...(avatar ? {avatar} : {}),
+    };
+
     return (
         <Header
+            className="px-4 md:px-6"
             style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                gap: 24,
+                gap: 12,
                 height: 64,
-                padding: '0 24px',
                 background: 'transparent',
                 lineHeight: 'normal',
                 ...style,
             }}
         >
-            <h2 className="m-0 text-2xl font-bold whitespace-nowrap"> Hello {userName}</h2>
-            <Space size={16} align="center">
-                <Badge dot color="red" offset={[-4, 4]}>
-                <div
-                    style={{
-                        width: 44, height: 44,
-                        display: 'grid', placeItems: 'center',
-                        background: '#fff', borderRadius: 12,
-                        boxShadow: '0px 2px 8px rgba(17,24,39,0.04)',
-                        cursor: 'pointer',
-                    }}
-
-                >
-                    <BellOutlined style={{ fontSize: 18, color: '#F5C518' }} />
-                </div>
-                </Badge>
-
-                <Space size={12} align="center" style={{cursor:"pointer"}}>
-                    <span className="font-medium whitespace-nowrap">{userName}</span>
-                    <Avatar src={avatar} alt="avatar" size={44} shape="square" style={{ borderRadius: 12}} />
-                </Space>
+            <Space size={12} align="center" style={{minWidth: 0}}>
+                {onToggleMenu && (
+                    <Button
+                        type="text"
+                        aria-label="Toggle menu"
+                        icon={menuCollapsed ? <MenuUnfoldOutlined/> : <MenuFoldOutlined/>}
+                        onClick={onToggleMenu}
+                        style={{fontSize: 18}}
+                    />
+                )}
+                <h2 className="m-0 truncate text-lg sm:text-2xl font-bold">Hello {user.name}</h2>
             </Space>
 
+            <Space size={12} align="center">
+                <NotificationsBell/>
+
+                <div
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Open my profile"
+                    onClick={() => setProfileOpen(true)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') setProfileOpen(true);
+                    }}
+                    style={{display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer'}}
+                >
+                    <span className="hidden sm:inline font-medium whitespace-nowrap">{user.name}</span>
+                    <Avatar src={user.avatar} alt="avatar" size={44} shape="square" style={{borderRadius: 12}}/>
+                </div>
+            </Space>
+
+            <UserProfileModal user={user} open={profileOpen} onClose={() => setProfileOpen(false)}/>
         </Header>
-    )
+    );
 }
